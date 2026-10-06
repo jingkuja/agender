@@ -53,3 +53,12 @@ def test_export_jsonschema(tmp_path):
     dest = export_jsonschema(tmp_path)
     for name in MODELS:
         assert (dest / f"{name}.json").exists()
+
+
+def test_checked_in_schemas_match_models(tmp_path):
+    from pathlib import Path
+    generated = export_jsonschema(tmp_path)
+    checked = Path(__file__).resolve().parents[2] / 'src/agender/protocol/jsonschema'
+    assert {p.name for p in generated.glob('*.json')} == {p.name for p in checked.glob('*.json')}
+    for path in generated.glob('*.json'):
+        assert path.read_text() == (checked / path.name).read_text(), path.name

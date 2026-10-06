@@ -127,6 +127,14 @@
           },
           "title": "Blockers",
           "type": "array"
+        },
+        "suggested_tasks": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Suggested Tasks",
+          "type": "array"
         }
       },
       "title": "HintsForPlanner",

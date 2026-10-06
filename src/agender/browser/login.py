@@ -48,16 +48,30 @@ async def run_session_login(
     confirm_cli: bool = False,
     timeout_s: float = 300,
 ) -> dict[str, Any]:
-    """Open public Douyin login page. Never persist the password."""
+    original_headless = runtime.cfg.browser.headless
+    try:
+        runtime.cfg.browser.headless = False
+        # A previously headless context must be recreated under the same profile lock.
+        if runtime.context is not None and (runtime.site != params.site or original_headless is True or str(original_headless).lower() == "true"):
+            await runtime.close_context()
+        return await _login(runtime, params, confirm_cli=confirm_cli, timeout_s=timeout_s)
+    finally:
+        runtime.cfg.browser.headless = original_headless
+
+
+async def _login(runtime, params, *, confirm_cli, timeout_s) -> dict[str, Any]:
+    """Open a platform login page. Never persist the password."""
+    site = params.site
     password = params.password
     params.password = None
-    page = await runtime.page("douyin")
-    if runtime.headless_for("douyin"):
+    runtime.navigator.configure(site, execution=runtime.navigator.execution)
+    page = await runtime.page(site)
+    if runtime.headless_for(site):
         # login is always headed
         await runtime.close_context()
         runtime.cfg.browser.headless = False
-        page = await runtime.page("douyin")
-    await page.goto(runtime.cfg.douyin.login_url, wait_until="domcontentloaded")
+        page = await runtime.page(site)
+    await runtime.navigator.open(getattr(runtime.cfg, site).login_url, site)
     method = "interactive"
     try:
         if params.username:
@@ -78,37 +92,43 @@ async def run_session_login(
     deadline = asyncio.get_event_loop().time() + timeout_s
     captcha_seen = False
     while asyncio.get_event_loop().time() < deadline:
+        if runtime.navigator.execution:
+            runtime.navigator.execution.check()
         if await _visible(page, LOGIN_SELECTORS["captcha"]):
             captcha_seen = True
-        session = await runtime.douyin_session()
-        if await login_heuristic(page, session):
+        session = await runtime.session(site)
+        logged_in = await login_heuristic(page, session) if site == "douyin" else session == SessionState.OK
+        if logged_in:
             if confirm_cli:
                 return {
                     "kind": "session.login",
-                    "site": "douyin",
-                    "sessions": {"douyin": session.value},
+                    "site": site,
+                    "sessions": {site: session.value},
                     "method": method,
                     "username_present": bool(params.username),
                     "needs_cli_confirm": True,
                 }
-            backup = runtime.backup_path("douyin")
+            backup = runtime.backup_path(site)
             if backup:
                 await runtime.export_state(backup)
             return {
                 "kind": "session.login",
-                "site": "douyin",
-                "sessions": {"douyin": SessionState.OK.value},
+                "site": site,
+                "sessions": {site: SessionState.OK.value},
                 "method": method,
                 "username_present": bool(params.username),
             }
-        await asyncio.sleep(1.5)
+        if runtime.navigator.execution:
+            await runtime.navigator.execution.sleep(1.5)
+        else:
+            await asyncio.sleep(1.5)
 
-    session = await runtime.douyin_session()
+    session = await runtime.session(site)
     code = "CAPTCHA" if captcha_seen else "LOGIN_WALL"
     return {
         "kind": "session.login",
-        "site": "douyin",
-        "sessions": {"douyin": session.value},
+        "site": site,
+        "sessions": {site: session.value},
         "method": method,
         "username_present": bool(params.username),
         "error_code": code,

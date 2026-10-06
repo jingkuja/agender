@@ -84,6 +84,8 @@ def check_url(
     if parsed.scheme not in {"http", "https"}:
         return PolicyDecision(False, "POLICY_DENIED", f"scheme {parsed.scheme}")
     host = parsed.hostname
+    if parsed.username or parsed.password:
+        return PolicyDecision(False, "POLICY_DENIED", "URL credentials are not allowed")
     if not host:
         return PolicyDecision(False, "POLICY_DENIED", "missing host")
     allow = allowlist or []
@@ -156,3 +158,30 @@ def robots_allowed(url: str, *, fetch, respect: bool) -> tuple[bool, bool]:
 
 def clear_robots_cache() -> None:
     _robots_cache.clear()
+
+
+async def robots_allowed_async(url: str, *, fetch, respect: bool) -> tuple[bool, bool]:
+    import asyncio
+    import inspect
+    import time
+    from urllib.robotparser import RobotFileParser
+
+    parsed = urlparse(url)
+    robots_url = f"{parsed.scheme}://{parsed.netloc}/robots.txt"
+    cached = _robots_cache.get(robots_url)
+    now = time.time()
+    if cached and now - cached[0] < ROBOTS_TTL:
+        rp = cached[1]
+    else:
+        # A synchronous injected fetcher is isolated from the heartbeat loop too.
+        if inspect.iscoroutinefunction(fetch):
+            body = await fetch(robots_url)
+        else:
+            body = await asyncio.to_thread(fetch, robots_url)
+            if inspect.isawaitable(body):
+                body = await body
+        rp = RobotFileParser()
+        rp.parse((body or "").splitlines())
+        _robots_cache[robots_url] = (now, rp)
+    allowed = rp is None or rp.can_fetch("AgenderWorker/0.1", url)
+    return (allowed or not respect), not allowed

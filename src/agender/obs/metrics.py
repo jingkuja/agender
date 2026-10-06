@@ -13,6 +13,9 @@ BLOCKED_TOTAL = Counter("agender_blocked_total", "Blocked tasks", ["site", "code
 CLAIM_EMPTY = Counter("agender_claim_empty_total", "Empty claims")
 BROWSER_UP = Gauge("agender_browser_up", "Browser process up")
 LAST_SUCCESS = Gauge("agender_last_success_unixtime", "Last success unix time", ["type"])
+SUBMIT_RETRY = Counter("agender_submit_retry_total", "Unacknowledged result submissions", ["code"])
+CHECKPOINT_RESTORE = Counter("agender_checkpoint_restore_total", "Restored checkpoints", ["type"])
+RATE_WAIT = Histogram("agender_rate_wait_seconds", "Time spent waiting for navigation/load action permits")
 
 
 def start_metrics(addr: str) -> None:

@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0",
+  "task_id": "bilibili_bundle_demo",
+  "type": "bilibili.bundle",
+  "params": {
+    "content_id": "BV1xx411c7mD",
+    "max_comments": 20,
+    "include_replies": true,
+    "max_replies_per_comment": 5
+  }
+}

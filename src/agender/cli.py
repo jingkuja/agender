@@ -10,6 +10,60 @@ from agender.config import load_config
 app = typer.Typer(name="agender-worker", no_args_is_help=True, help="Agender browsing worker")
 session_app = typer.Typer(no_args_is_help=True, help="Session import/export/login")
 app.add_typer(session_app, name="session")
+content_app = typer.Typer(no_args_is_help=True, help="Inspect and export the local content store")
+app.add_typer(content_app, name="content")
+
+
+@content_app.command("export")
+def content_export(ctx: typer.Context, output: Path = typer.Option(..., "--output"),
+                   table: str = typer.Option("contents", "--table"), format: str = typer.Option("jsonl", "--format")) -> None:
+    """Export a consistent snapshot as JSONL or CSV."""
+    import asyncio
+
+    from agender.store.content import TABLES, ContentStore
+    cfg = _cfg(ctx.obj["config"])
+    path = cfg.path(cfg.store.content_path)
+    if table not in TABLES or format not in {"jsonl", "csv"}:
+        raise typer.BadParameter("table: contents/comments/creators/metric_snapshots; format: jsonl/csv")
+    if not path.exists():
+        raise typer.BadParameter("content database does not exist; enable store.content_enabled and collect data first")
+    if output.resolve() in {path.resolve(), cfg.path(cfg.store.sqlite_path).resolve()}:
+        raise typer.BadParameter("output must not overwrite a database")
+    async def go():
+        store = ContentStore(path)
+        await store.open()
+        try:
+            count = await store.export(output, table=table, format=format)
+            typer.echo(f"exported {count} rows to {output.resolve()}")
+        finally:
+            await store.close()
+    asyncio.run(go())
+
+
+@content_app.command("status")
+def content_status(ctx: typer.Context) -> None:
+    """Show stored entity and checkpoint counts."""
+    import asyncio
+    import json
+
+    from agender.store.content import TABLES, ContentStore
+    cfg = _cfg(ctx.obj["config"])
+    path = cfg.path(cfg.store.content_path)
+    if not path.exists():
+        typer.echo("content database does not exist")
+        return
+    async def go():
+        store = ContentStore(path)
+        await store.open()
+        try:
+            counts = {}
+            for table in sorted(TABLES | {"checkpoints"}):
+                row = await (await store.db.execute(f"SELECT COUNT(*) FROM {table}")).fetchone()
+                counts[table] = row[0]
+            typer.echo(json.dumps(counts))
+        finally:
+            await store.close()
+    asyncio.run(go())
 
 
 def _cfg(config: Path | None) -> object:
@@ -48,6 +102,15 @@ def run(
 
 
 @app.command()
+def catalog(ctx: typer.Context) -> None:
+    """Print task schemas and templates for an AI planner (no browser required)."""
+    import json
+
+    from agender.protocol.planner import catalog as build_catalog
+    typer.echo(json.dumps(build_catalog(_cfg(ctx.obj["config"])), ensure_ascii=False, indent=2))
+
+
+@app.command()
 def doctor(ctx: typer.Context) -> None:
     """Check local runtime."""
     import sys
@@ -81,6 +144,21 @@ def doctor(ctx: typer.Context) -> None:
         errors.append("metrics_addr must be loopback")
     if not cfg.uses_http:
         typer.echo("FileClient mode")
+    typer.echo(f"Browser mode: {cfg.browser.mode}")
+    if cfg.browser.mode == "cdp":
+        import asyncio
+
+        from agender.browser.runtime import BrowserRuntime
+        async def check_cdp():
+            runtime = BrowserRuntime(cfg)
+            try:
+                await runtime.start("web")
+            finally:
+                await runtime.aclose()
+        try:
+            asyncio.run(check_cdp())
+        except Exception:
+            errors.append("CDP unavailable: start Chrome with --remote-debugging-port and a dedicated --user-data-dir; check AGENDER_CDP_ENDPOINT_URL or use AGENDER_BROWSER_MODE=playwright")
     if errors:
         for e in errors:
             typer.echo(f"FAIL: {e}")
@@ -111,6 +189,14 @@ def gc(ctx: typer.Context) -> None:
                 log_days=cfg.store.log_retention_days,
             )
             typer.echo(stats)
+            if cfg.path(cfg.store.content_path).exists():
+                from agender.store.content import ContentStore
+                content = ContentStore(cfg.path(cfg.store.content_path))
+                await content.open()
+                try:
+                    typer.echo({"expired_checkpoints": await content.prune_checkpoints()})
+                finally:
+                    await content.close()
         finally:
             await store.close()
 
@@ -130,22 +216,23 @@ def session_login(
     from agender.protocol.schemas import SessionLoginParams
 
     cfg = _cfg(ctx.obj["config"])
-    if site != "douyin":
-        raise typer.BadParameter("v1 only douyin")
+    from agender.platforms import SESSION_SITES
+    if site not in SESSION_SITES:
+        raise typer.BadParameter("site: douyin/xiaohongshu/weibo/bilibili")
 
     async def _go() -> None:
         rt = BrowserRuntime(cfg)
         try:
             result = await run_session_login(
                 rt,
-                SessionLoginParams(site="douyin", username=username),
+                SessionLoginParams(site=site, username=username),
                 confirm_cli=True,
                 timeout_s=cfg.limits.session_login_wall_clock_s,
             )
             if result.get("needs_cli_confirm"):
                 typer.echo("Press Enter to confirm login heuristic...")
                 input()
-                backup = rt.backup_path("douyin")
+                backup = rt.backup_path(site)
                 if backup:
                     await rt.export_state(backup)
             typer.echo(result)

@@ -1,0 +1,130 @@
+{
+  "$defs": {
+    "CaptureMode": {
+      "enum": [
+        "never",
+        "on_failure",
+        "always"
+      ],
+      "title": "CaptureMode",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "timeout_s": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Timeout S"
+    },
+    "capture_screenshot": {
+      "$ref": "#/$defs/CaptureMode",
+      "default": "on_failure"
+    },
+    "capture_html": {
+      "$ref": "#/$defs/CaptureMode",
+      "default": "never"
+    },
+    "upload_artifacts": {
+      "$ref": "#/$defs/CaptureMode",
+      "default": "never"
+    },
+    "respect_robots": {
+      "default": true,
+      "title": "Respect Robots",
+      "type": "boolean"
+    },
+    "redact_commenters": {
+      "default": false,
+      "title": "Redact Commenters",
+      "type": "boolean"
+    },
+    "locale": {
+      "default": "zh-CN",
+      "title": "Locale",
+      "type": "string"
+    },
+    "resume_from": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Resume From"
+    },
+    "since": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Since"
+    },
+    "known_ids": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 10000,
+      "title": "Known Ids",
+      "type": "array"
+    },
+    "url": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Url"
+    },
+    "video_id": {
+      "anyOf": [
+        {
+          "pattern": "^\\d{5,}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Video Id"
+    },
+    "max_comments": {
+      "default": 20,
+      "title": "Max Comments",
+      "type": "integer"
+    },
+    "include_replies": {
+      "default": false,
+      "title": "Include Replies",
+      "type": "boolean"
+    },
+    "max_replies_per_comment": {
+      "default": 5,
+      "maximum": 50,
+      "minimum": 0,
+      "title": "Max Replies Per Comment",
+      "type": "integer"
+    }
+  },
+  "title": "DouyinVideoParams",
+  "type": "object"
+}

@@ -1,0 +1,1835 @@
+{
+  "$defs": {
+    "Author": {
+      "additionalProperties": true,
+      "properties": {
+        "user_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "User Id"
+        },
+        "sec_uid": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sec Uid"
+        },
+        "nickname": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Nickname"
+        },
+        "follower_count": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Follower Count"
+        }
+      },
+      "title": "Author",
+      "type": "object"
+    },
+    "Comment": {
+      "additionalProperties": true,
+      "properties": {
+        "comment_id": {
+          "title": "Comment Id",
+          "type": "string"
+        },
+        "parent_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Parent Id"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "like_count": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Like Count"
+        },
+        "created_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Created At"
+        },
+        "commenter": {
+          "$ref": "#/$defs/Author"
+        },
+        "reply_count": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reply Count"
+        },
+        "replies": {
+          "items": {
+            "$ref": "#/$defs/Reply"
+          },
+          "title": "Replies",
+          "type": "array"
+        }
+      },
+      "required": [
+        "comment_id",
+        "text"
+      ],
+      "title": "Comment",
+      "type": "object"
+    },
+    "Creator": {
+      "additionalProperties": true,
+      "properties": {
+        "creator_id": {
+          "title": "Creator Id",
+          "type": "string"
+        },
+        "nickname": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Nickname"
+        },
+        "url": {
+          "default": "",
+          "title": "Url",
+          "type": "string"
+        },
+        "follower_count": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Follower Count"
+        }
+      },
+      "required": [
+        "creator_id"
+      ],
+      "title": "Creator",
+      "type": "object"
+    },
+    "CreatorPostsResult": {
+      "additionalProperties": true,
+      "properties": {
+        "result_schema_version": {
+          "const": "1.1",
+          "default": "1.1",
+          "title": "Result Schema Version",
+          "type": "string"
+        },
+        "observed_at": {
+          "title": "Observed At",
+          "type": "string"
+        },
+        "stop_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stop Reason"
+        },
+        "checkpoint_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Checkpoint Id"
+        },
+        "returned": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Returned",
+          "type": "integer"
+        },
+        "exhausted": {
+          "default": false,
+          "title": "Exhausted",
+          "type": "boolean"
+        },
+        "has_more": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Has More"
+        },
+        "limit_reached": {
+          "default": false,
+          "title": "Limit Reached",
+          "type": "boolean"
+        },
+        "kind": {
+          "const": "douyin.creator_posts",
+          "title": "Kind",
+          "type": "string"
+        },
+        "creator": {
+          "$ref": "#/$defs/Creator"
+        },
+        "items": {
+          "items": {
+            "$ref": "#/$defs/Video"
+          },
+          "title": "Items",
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "creator"
+      ],
+      "title": "CreatorPostsResult",
+      "type": "object"
+    },
+    "CreatorProfileResult": {
+      "additionalProperties": true,
+      "properties": {
+        "result_schema_version": {
+          "const": "1.1",
+          "default": "1.1",
+          "title": "Result Schema Version",
+          "type": "string"
+        },
+        "observed_at": {
+          "title": "Observed At",
+          "type": "string"
+        },
+        "stop_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stop Reason"
+        },
+        "checkpoint_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Checkpoint Id"
+        },
+        "kind": {
+          "const": "douyin.creator_profile",
+          "title": "Kind",
+          "type": "string"
+        },
+        "creator": {
+          "$ref": "#/$defs/Creator"
+        }
+      },
+      "required": [
+        "kind",
+        "creator"
+      ],
+      "title": "CreatorProfileResult",
+      "type": "object"
+    },
+    "Document": {
+      "additionalProperties": true,
+      "properties": {
+        "url": {
+          "title": "Url",
+          "type": "string"
+        },
+        "canonical_url": {
+          "title": "Canonical Url",
+          "type": "string"
+        },
+        "title": {
+          "default": "",
+          "title": "Title",
+          "type": "string"
+        },
+        "fetch_status": {
+          "enum": [
+            "ok",
+            "skipped",
+            "blocked",
+            "failed"
+          ],
+          "title": "Fetch Status",
+          "type": "string"
+        },
+        "body_text": {
+          "default": "",
+          "title": "Body Text",
+          "type": "string"
+        },
+        "body_chars": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Body Chars",
+          "type": "integer"
+        },
+        "published_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Published At"
+        },
+        "error": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Error"
+        }
+      },
+      "required": [
+        "url",
+        "canonical_url",
+        "fetch_status"
+      ],
+      "title": "Document",
+      "type": "object"
+    },
+    "DouyinCommentsResult": {
+      "additionalProperties": true,
+      "properties": {
+        "result_schema_version": {
+          "const": "1.1",
+          "default": "1.1",
+          "title": "Result Schema Version",
+          "type": "string"
+        },
+        "observed_at": {
+          "title": "Observed At",
+          "type": "string"
+        },
+        "stop_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stop Reason"
+        },
+        "checkpoint_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Checkpoint Id"
+        },
+        "returned": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Returned",
+          "type": "integer"
+        },
+        "exhausted": {
+          "default": false,
+          "title": "Exhausted",
+          "type": "boolean"
+        },
+        "has_more": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Has More"
+        },
+        "limit_reached": {
+          "default": false,
+          "title": "Limit Reached",
+          "type": "boolean"
+        },
+        "kind": {
+          "enum": [
+            "douyin.video_comments",
+            "douyin.video_bundle"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "video": {
+          "$ref": "#/$defs/Video"
+        },
+        "comments": {
+          "items": {
+            "$ref": "#/$defs/Comment"
+          },
+          "title": "Comments",
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "video"
+      ],
+      "title": "DouyinCommentsResult",
+      "type": "object"
+    },
+    "DouyinSearchResult": {
+      "additionalProperties": true,
+      "properties": {
+        "result_schema_version": {
+          "const": "1.1",
+          "default": "1.1",
+          "title": "Result Schema Version",
+          "type": "string"
+        },
+        "observed_at": {
+          "title": "Observed At",
+          "type": "string"
+        },
+        "stop_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stop Reason"
+        },
+        "checkpoint_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Checkpoint Id"
+        },
+        "returned": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Returned",
+          "type": "integer"
+        },
+        "exhausted": {
+          "default": false,
+          "title": "Exhausted",
+          "type": "boolean"
+        },
+        "has_more": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Has More"
+        },
+        "limit_reached": {
+          "default": false,
+          "title": "Limit Reached",
+          "type": "boolean"
+        },
+        "kind": {
+          "const": "douyin.search",
+          "title": "Kind",
+          "type": "string"
+        },
+        "query": {
+          "default": "",
+          "title": "Query",
+          "type": "string"
+        },
+        "items": {
+          "items": {
+            "$ref": "#/$defs/Video"
+          },
+          "title": "Items",
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "DouyinSearchResult",
+      "type": "object"
+    },
+    "DouyinStatsResult": {
+      "additionalProperties": true,
+      "properties": {
+        "result_schema_version": {
+          "const": "1.1",
+          "default": "1.1",
+          "title": "Result Schema Version",
+          "type": "string"
+        },
+        "observed_at": {
+          "title": "Observed At",
+          "type": "string"
+        },
+        "stop_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stop Reason"
+        },
+        "checkpoint_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Checkpoint Id"
+        },
+        "video_id": {
+          "title": "Video Id",
+          "type": "string"
+        },
+        "url": {
+          "default": "",
+          "title": "Url",
+          "type": "string"
+        },
+        "title": {
+          "default": "",
+          "title": "Title",
+          "type": "string"
+        },
+        "author": {
+          "$ref": "#/$defs/Author"
+        },
+        "stats": {
+          "$ref": "#/$defs/Stats"
+        },
+        "published_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Published At"
+        },
+        "kind": {
+          "const": "douyin.video_stats",
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "video_id",
+        "kind"
+      ],
+      "title": "DouyinStatsResult",
+      "type": "object"
+    },
+    "HotSource": {
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "ok",
+            "skipped",
+            "blocked",
+            "failed"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "items": {
+          "items": {
+            "$ref": "#/$defs/SearchHit"
+          },
+          "title": "Items",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "status"
+      ],
+      "title": "HotSource",
+      "type": "object"
+    },
+    "LoginResult": {
+      "additionalProperties": true,
+      "properties": {
+        "result_schema_version": {
+          "const": "1.1",
+          "default": "1.1",
+          "title": "Result Schema Version",
+          "type": "string"
+        },
+        "observed_at": {
+          "title": "Observed At",
+          "type": "string"
+        },
+        "stop_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stop Reason"
+        },
+        "checkpoint_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Checkpoint Id"
+        },
+        "kind": {
+          "const": "session.login",
+          "title": "Kind",
+          "type": "string"
+        },
+        "site": {
+          "default": "douyin",
+          "enum": [
+            "douyin",
+            "xiaohongshu",
+            "weibo",
+            "bilibili"
+          ],
+          "title": "Site",
+          "type": "string"
+        },
+        "sessions": {
+          "additionalProperties": {
+            "enum": [
+              "ok",
+              "expired",
+              "missing",
+              "unknown"
+            ],
+            "type": "string"
+          },
+          "title": "Sessions",
+          "type": "object"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "LoginResult",
+      "type": "object"
+    },
+    "Reply": {
+      "additionalProperties": true,
+      "properties": {
+        "comment_id": {
+          "title": "Comment Id",
+          "type": "string"
+        },
+        "parent_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Parent Id"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "like_count": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Like Count"
+        },
+        "created_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Created At"
+        },
+        "commenter": {
+          "$ref": "#/$defs/Author"
+        }
+      },
+      "required": [
+        "comment_id",
+        "text"
+      ],
+      "title": "Reply",
+      "type": "object"
+    },
+    "SearchHit": {
+      "additionalProperties": true,
+      "properties": {
+        "url": {
+          "title": "Url",
+          "type": "string"
+        },
+        "title": {
+          "default": "",
+          "title": "Title",
+          "type": "string"
+        },
+        "snippet": {
+          "default": "",
+          "title": "Snippet",
+          "type": "string"
+        }
+      },
+      "required": [
+        "url"
+      ],
+      "title": "SearchHit",
+      "type": "object"
+    },
+    "SocialCommentsResult": {
+      "additionalProperties": true,
+      "properties": {
+        "result_schema_version": {
+          "const": "1.1",
+          "default": "1.1",
+          "title": "Result Schema Version",
+          "type": "string"
+        },
+        "observed_at": {
+          "title": "Observed At",
+          "type": "string"
+        },
+        "stop_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stop Reason"
+        },
+        "checkpoint_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Checkpoint Id"
+        },
+        "returned": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Returned",
+          "type": "integer"
+        },
+        "exhausted": {
+          "default": false,
+          "title": "Exhausted",
+          "type": "boolean"
+        },
+        "has_more": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Has More"
+        },
+        "limit_reached": {
+          "default": false,
+          "title": "Limit Reached",
+          "type": "boolean"
+        },
+        "kind": {
+          "enum": [
+            "xiaohongshu.comments",
+            "weibo.comments",
+            "bilibili.comments",
+            "xiaohongshu.bundle",
+            "weibo.bundle",
+            "bilibili.bundle"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "content": {
+          "$ref": "#/$defs/SocialContent"
+        },
+        "comments": {
+          "items": {
+            "$ref": "#/$defs/Comment"
+          },
+          "title": "Comments",
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "content"
+      ],
+      "title": "SocialCommentsResult",
+      "type": "object"
+    },
+    "SocialContent": {
+      "additionalProperties": true,
+      "properties": {
+        "content_id": {
+          "title": "Content Id",
+          "type": "string"
+        },
+        "url": {
+          "title": "Url",
+          "type": "string"
+        },
+        "title": {
+          "default": "",
+          "title": "Title",
+          "type": "string"
+        },
+        "text": {
+          "default": "",
+          "title": "Text",
+          "type": "string"
+        },
+        "author": {
+          "$ref": "#/$defs/Author"
+        },
+        "stats": {
+          "$ref": "#/$defs/Stats"
+        },
+        "published_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Published At"
+        },
+        "content_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Content Type"
+        },
+        "cover_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cover Url"
+        },
+        "image_urls": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Image Urls",
+          "type": "array"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags",
+          "type": "array"
+        },
+        "duration_s": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Duration S"
+        }
+      },
+      "required": [
+        "content_id",
+        "url"
+      ],
+      "title": "SocialContent",
+      "type": "object"
+    },
+    "SocialCreatorPostsResult": {
+      "additionalProperties": true,
+      "properties": {
+        "result_schema_version": {
+          "const": "1.1",
+          "default": "1.1",
+          "title": "Result Schema Version",
+          "type": "string"
+        },
+        "observed_at": {
+          "title": "Observed At",
+          "type": "string"
+        },
+        "stop_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stop Reason"
+        },
+        "checkpoint_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Checkpoint Id"
+        },
+        "returned": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Returned",
+          "type": "integer"
+        },
+        "exhausted": {
+          "default": false,
+          "title": "Exhausted",
+          "type": "boolean"
+        },
+        "has_more": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Has More"
+        },
+        "limit_reached": {
+          "default": false,
+          "title": "Limit Reached",
+          "type": "boolean"
+        },
+        "kind": {
+          "enum": [
+            "xiaohongshu.creator_posts",
+            "weibo.creator_posts",
+            "bilibili.creator_posts"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "creator": {
+          "$ref": "#/$defs/Creator"
+        },
+        "items": {
+          "items": {
+            "$ref": "#/$defs/SocialContent"
+          },
+          "title": "Items",
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "creator"
+      ],
+      "title": "SocialCreatorPostsResult",
+      "type": "object"
+    },
+    "SocialCreatorProfileResult": {
+      "additionalProperties": true,
+      "properties": {
+        "result_schema_version": {
+          "const": "1.1",
+          "default": "1.1",
+          "title": "Result Schema Version",
+          "type": "string"
+        },
+        "observed_at": {
+          "title": "Observed At",
+          "type": "string"
+        },
+        "stop_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stop Reason"
+        },
+        "checkpoint_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Checkpoint Id"
+        },
+        "kind": {
+          "enum": [
+            "xiaohongshu.creator_profile",
+            "weibo.creator_profile",
+            "bilibili.creator_profile"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "creator": {
+          "$ref": "#/$defs/Creator"
+        }
+      },
+      "required": [
+        "kind",
+        "creator"
+      ],
+      "title": "SocialCreatorProfileResult",
+      "type": "object"
+    },
+    "SocialDetailResult": {
+      "additionalProperties": true,
+      "properties": {
+        "result_schema_version": {
+          "const": "1.1",
+          "default": "1.1",
+          "title": "Result Schema Version",
+          "type": "string"
+        },
+        "observed_at": {
+          "title": "Observed At",
+          "type": "string"
+        },
+        "stop_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stop Reason"
+        },
+        "checkpoint_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Checkpoint Id"
+        },
+        "kind": {
+          "enum": [
+            "xiaohongshu.detail",
+            "weibo.detail",
+            "bilibili.detail"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "content": {
+          "$ref": "#/$defs/SocialContent"
+        }
+      },
+      "required": [
+        "kind",
+        "content"
+      ],
+      "title": "SocialDetailResult",
+      "type": "object"
+    },
+    "SocialSearchResult": {
+      "additionalProperties": true,
+      "properties": {
+        "result_schema_version": {
+          "const": "1.1",
+          "default": "1.1",
+          "title": "Result Schema Version",
+          "type": "string"
+        },
+        "observed_at": {
+          "title": "Observed At",
+          "type": "string"
+        },
+        "stop_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stop Reason"
+        },
+        "checkpoint_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Checkpoint Id"
+        },
+        "returned": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Returned",
+          "type": "integer"
+        },
+        "exhausted": {
+          "default": false,
+          "title": "Exhausted",
+          "type": "boolean"
+        },
+        "has_more": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Has More"
+        },
+        "limit_reached": {
+          "default": false,
+          "title": "Limit Reached",
+          "type": "boolean"
+        },
+        "kind": {
+          "enum": [
+            "xiaohongshu.search",
+            "weibo.search",
+            "bilibili.search"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "query": {
+          "default": "",
+          "title": "Query",
+          "type": "string"
+        },
+        "items": {
+          "items": {
+            "$ref": "#/$defs/SocialContent"
+          },
+          "title": "Items",
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "SocialSearchResult",
+      "type": "object"
+    },
+    "Stats": {
+      "additionalProperties": true,
+      "properties": {
+        "play_count": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Play Count"
+        },
+        "like_count": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Like Count"
+        },
+        "comment_count": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Comment Count"
+        },
+        "share_count": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Share Count"
+        },
+        "collect_count": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Collect Count"
+        }
+      },
+      "title": "Stats",
+      "type": "object"
+    },
+    "Video": {
+      "additionalProperties": true,
+      "properties": {
+        "video_id": {
+          "title": "Video Id",
+          "type": "string"
+        },
+        "url": {
+          "default": "",
+          "title": "Url",
+          "type": "string"
+        },
+        "title": {
+          "default": "",
+          "title": "Title",
+          "type": "string"
+        },
+        "author": {
+          "$ref": "#/$defs/Author"
+        },
+        "stats": {
+          "$ref": "#/$defs/Stats"
+        },
+        "published_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Published At"
+        }
+      },
+      "required": [
+        "video_id"
+      ],
+      "title": "Video",
+      "type": "object"
+    },
+    "WebArticlesResult": {
+      "additionalProperties": true,
+      "properties": {
+        "result_schema_version": {
+          "const": "1.1",
+          "default": "1.1",
+          "title": "Result Schema Version",
+          "type": "string"
+        },
+        "observed_at": {
+          "title": "Observed At",
+          "type": "string"
+        },
+        "stop_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stop Reason"
+        },
+        "checkpoint_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Checkpoint Id"
+        },
+        "kind": {
+          "const": "web.fetch_article",
+          "title": "Kind",
+          "type": "string"
+        },
+        "documents": {
+          "items": {
+            "$ref": "#/$defs/Document"
+          },
+          "title": "Documents",
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "WebArticlesResult",
+      "type": "object"
+    },
+    "WebHotListResult": {
+      "additionalProperties": true,
+      "properties": {
+        "result_schema_version": {
+          "const": "1.1",
+          "default": "1.1",
+          "title": "Result Schema Version",
+          "type": "string"
+        },
+        "observed_at": {
+          "title": "Observed At",
+          "type": "string"
+        },
+        "stop_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stop Reason"
+        },
+        "checkpoint_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Checkpoint Id"
+        },
+        "kind": {
+          "const": "web.hot_list",
+          "title": "Kind",
+          "type": "string"
+        },
+        "sources": {
+          "items": {
+            "$ref": "#/$defs/HotSource"
+          },
+          "title": "Sources",
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "WebHotListResult",
+      "type": "object"
+    },
+    "WebResearchResult": {
+      "additionalProperties": true,
+      "properties": {
+        "result_schema_version": {
+          "const": "1.1",
+          "default": "1.1",
+          "title": "Result Schema Version",
+          "type": "string"
+        },
+        "observed_at": {
+          "title": "Observed At",
+          "type": "string"
+        },
+        "stop_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stop Reason"
+        },
+        "checkpoint_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Checkpoint Id"
+        },
+        "kind": {
+          "const": "web.research",
+          "title": "Kind",
+          "type": "string"
+        },
+        "query": {
+          "default": "",
+          "title": "Query",
+          "type": "string"
+        },
+        "serp": {
+          "items": {
+            "$ref": "#/$defs/SearchHit"
+          },
+          "title": "Serp",
+          "type": "array"
+        },
+        "documents": {
+          "items": {
+            "$ref": "#/$defs/Document"
+          },
+          "title": "Documents",
+          "type": "array"
+        },
+        "engine_used": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Engine Used"
+        },
+        "engine_fallback": {
+          "default": false,
+          "title": "Engine Fallback",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "WebResearchResult",
+      "type": "object"
+    },
+    "WebSearchResult": {
+      "additionalProperties": true,
+      "properties": {
+        "result_schema_version": {
+          "const": "1.1",
+          "default": "1.1",
+          "title": "Result Schema Version",
+          "type": "string"
+        },
+        "observed_at": {
+          "title": "Observed At",
+          "type": "string"
+        },
+        "stop_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stop Reason"
+        },
+        "checkpoint_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Checkpoint Id"
+        },
+        "returned": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Returned",
+          "type": "integer"
+        },
+        "exhausted": {
+          "default": false,
+          "title": "Exhausted",
+          "type": "boolean"
+        },
+        "has_more": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Has More"
+        },
+        "limit_reached": {
+          "default": false,
+          "title": "Limit Reached",
+          "type": "boolean"
+        },
+        "kind": {
+          "const": "web.search",
+          "title": "Kind",
+          "type": "string"
+        },
+        "query": {
+          "default": "",
+          "title": "Query",
+          "type": "string"
+        },
+        "serp": {
+          "items": {
+            "$ref": "#/$defs/SearchHit"
+          },
+          "title": "Serp",
+          "type": "array"
+        },
+        "engine_used": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Engine Used"
+        },
+        "engine_fallback": {
+          "default": false,
+          "title": "Engine Fallback",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "WebSearchResult",
+      "type": "object"
+    }
+  },
+  "discriminator": {
+    "mapping": {
+      "bilibili.bundle": "#/$defs/SocialCommentsResult",
+      "bilibili.comments": "#/$defs/SocialCommentsResult",
+      "bilibili.creator_posts": "#/$defs/SocialCreatorPostsResult",
+      "bilibili.creator_profile": "#/$defs/SocialCreatorProfileResult",
+      "bilibili.detail": "#/$defs/SocialDetailResult",
+      "bilibili.search": "#/$defs/SocialSearchResult",
+      "douyin.creator_posts": "#/$defs/CreatorPostsResult",
+      "douyin.creator_profile": "#/$defs/CreatorProfileResult",
+      "douyin.search": "#/$defs/DouyinSearchResult",
+      "douyin.video_bundle": "#/$defs/DouyinCommentsResult",
+      "douyin.video_comments": "#/$defs/DouyinCommentsResult",
+      "douyin.video_stats": "#/$defs/DouyinStatsResult",
+      "session.login": "#/$defs/LoginResult",
+      "web.fetch_article": "#/$defs/WebArticlesResult",
+      "web.hot_list": "#/$defs/WebHotListResult",
+      "web.research": "#/$defs/WebResearchResult",
+      "web.search": "#/$defs/WebSearchResult",
+      "weibo.bundle": "#/$defs/SocialCommentsResult",
+      "weibo.comments": "#/$defs/SocialCommentsResult",
+      "weibo.creator_posts": "#/$defs/SocialCreatorPostsResult",
+      "weibo.creator_profile": "#/$defs/SocialCreatorProfileResult",
+      "weibo.detail": "#/$defs/SocialDetailResult",
+      "weibo.search": "#/$defs/SocialSearchResult",
+      "xiaohongshu.bundle": "#/$defs/SocialCommentsResult",
+      "xiaohongshu.comments": "#/$defs/SocialCommentsResult",
+      "xiaohongshu.creator_posts": "#/$defs/SocialCreatorPostsResult",
+      "xiaohongshu.creator_profile": "#/$defs/SocialCreatorProfileResult",
+      "xiaohongshu.detail": "#/$defs/SocialDetailResult",
+      "xiaohongshu.search": "#/$defs/SocialSearchResult"
+    },
+    "propertyName": "kind"
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/DouyinSearchResult"
+    },
+    {
+      "$ref": "#/$defs/DouyinStatsResult"
+    },
+    {
+      "$ref": "#/$defs/DouyinCommentsResult"
+    },
+    {
+      "$ref": "#/$defs/CreatorProfileResult"
+    },
+    {
+      "$ref": "#/$defs/CreatorPostsResult"
+    },
+    {
+      "$ref": "#/$defs/WebSearchResult"
+    },
+    {
+      "$ref": "#/$defs/WebArticlesResult"
+    },
+    {
+      "$ref": "#/$defs/WebResearchResult"
+    },
+    {
+      "$ref": "#/$defs/WebHotListResult"
+    },
+    {
+      "$ref": "#/$defs/LoginResult"
+    },
+    {
+      "$ref": "#/$defs/SocialSearchResult"
+    },
+    {
+      "$ref": "#/$defs/SocialDetailResult"
+    },
+    {
+      "$ref": "#/$defs/SocialCommentsResult"
+    },
+    {
+      "$ref": "#/$defs/SocialCreatorProfileResult"
+    },
+    {
+      "$ref": "#/$defs/SocialCreatorPostsResult"
+    }
+  ]
+}

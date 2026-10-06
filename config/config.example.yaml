@@ -9,6 +9,8 @@ worker:
   heartbeat_interval_s: 20
   task_wall_clock_s: 180
   task_hard_cap_s: 600
+  shutdown_grace_s: 5
+  submit_retry_s: 2
   file_client:
     inbox_dir: data/inbox/tasks
     outbox_dir: data/outbox
@@ -16,8 +18,14 @@ worker:
 tools:
   web: true
   douyin: false
+  xiaohongshu: false
+  weibo: false
+  bilibili: false
 
 browser:
+  mode: cdp # cdp connects to existing Chrome; playwright launches a managed browser
+  cdp_endpoint_url: http://127.0.0.1:9222
+  cdp_timeout_ms: 10000
   channel: chrome
   headless: auto
   locale: zh-CN
@@ -29,6 +37,9 @@ browser:
   profile_dir: data/profiles
   session_backup:
     douyin: data/sessions/douyin.storage_state.json
+    xiaohongshu: data/sessions/xiaohongshu.storage_state.json
+    weibo: data/sessions/weibo.storage_state.json
+    bilibili: data/sessions/bilibili.storage_state.json
 
 limits:
   douyin_comments_default: 20
@@ -40,18 +51,50 @@ limits:
   web_urls_max: 20
   per_host_rpm:
     www.douyin.com: 6
+    www.xiaohongshu.com: 6
+    weibo.com: 6
+    s.weibo.com: 6
+    m.weibo.cn: 6
+    www.bilibili.com: 6
+    search.bilibili.com: 6
+    space.bilibili.com: 6
     default: 10
 
 douyin:
   tos_ack: false
+  creator_enabled: false
+  max_scroll_rounds: 30
+  stall_rounds: 3
+  load_wait_s: 8
   base_url: https://www.douyin.com
   login_url: https://www.douyin.com/
-  selector_pack_version: "2026-09-11"
+  selector_pack_version: "2026-10-06"
   redirect_allowlist:
     - v.douyin.com
     - www.douyin.com
     - www.iesdouyin.com
   session_cookie_names: ["sessionid", "sid_tt", "uid_tt", "ttwid"]
+
+xiaohongshu:
+  tos_ack: false
+  creator_enabled: true
+  max_scroll_rounds: 30
+  stall_rounds: 3
+  load_wait_s: 2
+
+weibo:
+  tos_ack: false
+  creator_enabled: true
+  max_scroll_rounds: 30
+  stall_rounds: 3
+  load_wait_s: 2
+
+bilibili:
+  tos_ack: false
+  creator_enabled: true
+  max_scroll_rounds: 30
+  stall_rounds: 3
+  load_wait_s: 2
 
 web:
   respect_robots: true
@@ -87,11 +130,18 @@ web:
 
 store:
   sqlite_path: data/agender.db
+  content_enabled: false
+  content_path: data/content.db
+  checkpoint_ttl_s: 86400
   artifact_dir: data/artifacts
   log_path: data/logs/agender.jsonl
   artifact_retention_days: 7
   run_retention_days: 30
   log_retention_days: 14
+
+health:
+  failure_threshold: 5
+  cooldown_s: 1800
 
 observability:
   log_level: INFO

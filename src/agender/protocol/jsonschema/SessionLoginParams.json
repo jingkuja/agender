@@ -1,0 +1,117 @@
+{
+  "$defs": {
+    "CaptureMode": {
+      "enum": [
+        "never",
+        "on_failure",
+        "always"
+      ],
+      "title": "CaptureMode",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "timeout_s": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": 300,
+      "title": "Timeout S"
+    },
+    "capture_screenshot": {
+      "$ref": "#/$defs/CaptureMode",
+      "default": "on_failure"
+    },
+    "capture_html": {
+      "$ref": "#/$defs/CaptureMode",
+      "default": "never"
+    },
+    "upload_artifacts": {
+      "$ref": "#/$defs/CaptureMode",
+      "default": "never"
+    },
+    "respect_robots": {
+      "default": true,
+      "title": "Respect Robots",
+      "type": "boolean"
+    },
+    "redact_commenters": {
+      "default": false,
+      "title": "Redact Commenters",
+      "type": "boolean"
+    },
+    "locale": {
+      "default": "zh-CN",
+      "title": "Locale",
+      "type": "string"
+    },
+    "resume_from": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Resume From"
+    },
+    "since": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Since"
+    },
+    "known_ids": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 10000,
+      "title": "Known Ids",
+      "type": "array"
+    },
+    "site": {
+      "default": "douyin",
+      "title": "Site",
+      "type": "string"
+    },
+    "username": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Username"
+    },
+    "password": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Password"
+    }
+  },
+  "title": "SessionLoginParams",
+  "type": "object"
+}

@@ -17,19 +17,22 @@ class UnsupportedUrl(ValueError):
 def parse_count(text: str | None) -> int | None:
     if text is None:
         return None
-    raw = text.strip().replace(",", "").replace("+", "")
+    raw = str(text).strip().replace(",", "").replace("+", "")
     if not raw or raw in {"-", "--"}:
         return None
-    m = COUNT_RE.match(raw)
+    m = re.search(r"(?<![\d.-])(\d+(?:\.\d+)?)\s*([万亿wk千m]?)", raw, re.I)
     if not m:
-        digits = re.sub(r"[^\d]", "", raw)
-        return int(digits) if digits else None
+        return None
     num = float(m.group(1))
     unit = (m.group(2) or "").lower()
     if unit in {"万", "w"}:
         num *= 10_000
     elif unit == "亿":
         num *= 100_000_000
+    elif unit in {"k", "千"}:
+        num *= 1_000
+    elif unit == "m":
+        num *= 1_000_000
     return int(num)
 
 
@@ -40,7 +43,7 @@ def extract_video_id(url: str) -> str | None:
         return m.group(1)
     q = parse_qs(parsed.query)
     for key in ("modal_id", "aweme_id", "item_id"):
-        if q.get(key):
+        if q.get(key) and re.fullmatch(r"\d{5,}", q[key][0]):
             return q[key][0]
     return None
 
@@ -53,6 +56,8 @@ def host_allowed(host: str, allowlist: list[str]) -> bool:
 def canonicalize_video_url(url: str, allowlist: list[str] | None = None) -> tuple[str, str]:
     allow = allowlist or list(ALLOW_DEFAULT)
     parsed = urlparse(url)
+    if parsed.scheme not in {"http", "https"} or not parsed.hostname or parsed.username or parsed.password:
+        raise UnsupportedUrl("invalid URL")
     if NOTE_RE.search(parsed.path or ""):
         raise UnsupportedUrl("note posts are not supported in v1")
     if parsed.hostname and not host_allowed(parsed.hostname, allow):

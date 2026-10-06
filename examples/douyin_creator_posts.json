@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0",
+  "task_id": "ex_douyin_creator_posts",
+  "attempt": 1,
+  "type": "douyin.creator_posts",
+  "params": {
+    "sec_uid": "REPLACE_WITH_PUBLIC_SEC_UID",
+    "max_posts": 20,
+    "known_ids": []
+  }
+}

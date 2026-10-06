@@ -38,6 +38,7 @@
           "type": "string"
         },
         "task_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
           "title": "Task Id",
           "type": "string"
         },
@@ -52,6 +53,7 @@
         },
         "attempt": {
           "default": 1,
+          "minimum": 1,
           "title": "Attempt",
           "type": "integer"
         },

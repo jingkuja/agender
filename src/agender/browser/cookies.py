@@ -24,11 +24,18 @@ def load_storage_state(path: Path) -> dict[str, Any]:
 
 
 def douyin_session_state(cookies: list[dict[str, Any]], names: list[str]) -> SessionState:
+    selected = [c for c in cookies if c.get("name") in names]
+    state = session_state(selected, list(SESSION_OK_NAMES))
+    return SessionState.EXPIRED if selected and state == SessionState.MISSING else state
+
+
+def session_state(cookies: list[dict[str, Any]], names: list[str]) -> SessionState:
     now = datetime.now(UTC).timestamp()
     present = {c.get("name"): c for c in cookies if c.get("name") in names}
     if not present:
         return SessionState.MISSING
-    for key in SESSION_OK_NAMES:
+    expired = False
+    for key in names:
         cookie = present.get(key)
         if not cookie:
             continue
@@ -41,6 +48,8 @@ def douyin_session_state(cookies: list[dict[str, Any]], names: list[str]) -> Ses
             return SessionState.OK
         if exp > now + 300:
             return SessionState.OK
+        expired = True
+    if expired:
         return SessionState.EXPIRED
     named = [c for c in present.values() if c.get("name") in names]
     if named:
@@ -48,7 +57,7 @@ def douyin_session_state(cookies: list[dict[str, Any]], names: list[str]) -> Ses
     return SessionState.MISSING
 
 
-async def apply_storage_state(context: Any, state: dict[str, Any]) -> None:
+async def apply_storage_state(context: Any, state: dict[str, Any], *, guard=None) -> None:
     cookies = state.get("cookies") or []
     if cookies:
         await context.add_cookies(cookies)
@@ -59,6 +68,8 @@ async def apply_storage_state(context: Any, state: dict[str, Any]) -> None:
             continue
         page = await context.new_page()
         try:
+            if guard:
+                await page.route("**/*", guard)
             await page.goto(origin_url, wait_until="domcontentloaded")
             for item in ls:
                 name = item.get("name")

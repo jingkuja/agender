@@ -61,6 +61,9 @@ async def test_worker_file_client_search(cfg, tmp_path, html, monkeypatch):
     monkeypatch.setattr(Router, "execute", execute)
 
     loop = WorkerLoop(cfg, runtime=None, client=client, store=store)
+    # This test injects an HTML fetcher instead of starting a browser.
+    from unittest.mock import AsyncMock
+    loop._caps = AsyncMock(return_value=(["web.search"], [], None, None, True))
     loop._locks = []
     await loop._idle_once()
     dest = outbox / "results" / "tsk_web.json"

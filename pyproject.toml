@@ -1,7 +1,7 @@
 [project]
 name = "agender-worker"
 version = "0.1.0"
-description = "Unattended browsing worker for public Douyin pages and web research."
+description = "AI-dispatched browsing worker for Douyin, Xiaohongshu, Weibo, Bilibili and web research."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

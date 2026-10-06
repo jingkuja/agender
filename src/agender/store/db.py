@@ -12,7 +12,6 @@ from agender.protocol.redact import strip_secrets
 
 SCHEMA = """
 PRAGMA journal_mode=WAL;
-PRAGMA user_version=1;
 CREATE TABLE IF NOT EXISTS task_runs (
   id            TEXT PRIMARY KEY,
   task_id       TEXT NOT NULL,
@@ -67,7 +66,14 @@ class Store:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self._db = await aiosqlite.connect(self.path)
         self._db.row_factory = aiosqlite.Row
+        cur = await self._db.execute("PRAGMA user_version")
+        version = (await cur.fetchone())[0]
+        if version not in (0, 1):
+            await self.close()
+            raise RuntimeError(f"unsupported run database version: {version}")
         await self._db.executescript(SCHEMA)
+        if version == 0:
+            await self._db.execute("PRAGMA user_version=1")
         await self._db.commit()
 
     @property
@@ -115,6 +121,8 @@ class Store:
         await self.db.commit()
 
     async def mark(self, run_id: str, status: str, **fields: Any) -> None:
+        if fields.keys() - {"lease_until", "submitted_at", "error_code"}:
+            raise ValueError("unsupported run field")
         sets = ["status=?"]
         vals: list[Any] = [status]
         for k, v in fields.items():
@@ -122,6 +130,22 @@ class Store:
             vals.append(v)
         vals.append(run_id)
         await self.db.execute(f"UPDATE task_runs SET {', '.join(sets)} WHERE id=?", vals)
+        await self.db.commit()
+
+    async def save_snapshot(self, run_id: str, result: dict[str, Any]) -> None:
+        await self.db.execute("UPDATE task_runs SET result_json=? WHERE id=? AND status='running'",
+                              (json.dumps(strip_secrets(result), ensure_ascii=False), run_id))
+        await self.db.commit()
+
+    async def get_run(self, task_id: str, attempt: int):
+        cur = await self.db.execute("SELECT * FROM task_runs WHERE task_id=? AND attempt=?", (task_id, attempt))
+        return await cur.fetchone()
+
+    async def renew_lease(self, task_id: str, attempt: int, lease_until: str) -> None:
+        await self.db.execute(
+            "UPDATE task_runs SET lease_until=? WHERE task_id=? AND attempt=?",
+            (lease_until, task_id, attempt),
+        )
         await self.db.commit()
 
     async def unfinished(self) -> list[aiosqlite.Row]:
@@ -162,7 +186,7 @@ class Store:
                  SUM(CASE WHEN error_code IS NOT NULL OR status='acked' THEN 1 ELSE 0 END) AS n,
                  SUM(CASE WHEN json_extract(result_json, '$.status') = 'blocked' THEN 1 ELSE 0 END) AS b
                FROM task_runs
-               WHERE status='acked' AND started_at >= datetime('now', '-1 hour')"""
+               WHERE status='acked' AND julianday(started_at) >= julianday('now', '-1 hour')"""
         )
         row = await cur.fetchone()
         n = (row["n"] if row else 0) or 0

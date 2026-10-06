@@ -5,12 +5,14 @@
 | 标题 | Agender Worker：抖音公开页浏览与 Web 热点/知识采集工具 |
 | 作者 | Grok design-doc-writer |
 | 日期 | 2026-09-11 |
-| 状态 | Draft（rev 3，用户拍板开放问题） |
-| 仓库 | `/Users/nikin/project/practice/agender`（greenfield：无源码、无 git；**本文是第一份文档**） |
+| 状态 | 原始设计保留；2026-10-06 功能补全实现已落地，验收状态见 IMPLEMENTATION_STATUS.md |
+| 仓库 | `/Users/nikin/project/practice/agender`（已有源码、测试与 Git 基线） |
 | 范围 | **仅 Worker / 工具侧**；服务端 LLM 编排、任务规划、prompt、多租户控制面均不在本仓库实现 |
 | CLI | 控制台脚本 **`agender-worker`**（避免与 `lot-agent/deploy/rust/agender` 撞名）；`python -m agender` 指向同一入口 |
 
 ---
+
+> 本文是历史设计，不代表每项发布验收已通过。本次新增作者、内容库、恢复、导航出口及结果语义，以 [协议](protocol.md) 和 [实施记录](IMPLEMENTATION_STATUS.md) 为准。
 
 ## Overview
 
@@ -35,7 +37,7 @@ v1 运行假设：**操作员桌面上一份有头 Chrome**，单进程、单 pr
 
 ### 当前状态
 
-- 本仓库无源码、无 git；**本文件为第一份文档**（`docs/DESIGN.md`）。
+- 本仓库已有 Python Worker、测试与 Git 基线；本文保留原始设计背景。当前协议、字段语义及实现状态以 `docs/protocol.md`、`docs/IMPLEMENTATION_STATUS.md` 为准。
 - 相邻项目 **不是依赖**：
   - `/Users/nikin/project/practice/lot-agent`：TypeScript 数字员工 / 营销 CRM，**禁止并入**。其 `deploy/rust/agender` 已是另一个名为 `agender` 的可执行文件（机器信息，`:8080`）。本仓库 CLI 因此使用 **`agender-worker`**。
   - `/Users/nikin/project/practice/charge`：Python + Playwright 充值工具。仅作浏览器运维**先验**，**不 import、不拷贝支付逻辑**。对照必须写清，避免 PR4 误搬：
@@ -415,7 +417,7 @@ disabled_capabilities: douyin.video_comments、douyin.video_bundle
 | 合绑 | 同一页先 stats 再 comments | `douyin.video_bundle` | 需要会话；软墙钟 240s；默认 20 条评论 |
 | 按需登录 | 公开登录页 + 有头人工验证 | `session.login` | 默认不登录；LLM 下发才跑；密码不落盘 |
 | 图文 | `https://www.douyin.com/note/{id}` | — | **v1 不支持** → `failed`/`UNSUPPORTED_URL` |
-| 作者页 | `/user/{sec_uid}` | — | 非 v1 |
+| 作者页 | `/user/{sec_uid}` | `douyin.creator_profile` / `douyin.creator_posts` | 需 creator_enabled，实站验收待完成 |
 
 #### 短链与跳转 allowlist
 
@@ -446,7 +448,7 @@ www.iesdouyin.com
 | 评论面板 | 评论列表容器 locator | 8s；失败即走 LOGIN_WALL/EMPTY_RENDER 分类 |
 | 评论滚动一轮 | **评论 item 数量增加**，或 8s 内不增加 → 本轮无新增 | 8s / 轮 |
 
-连续 3 轮无新增 → `exhausted=true`。
+2026-10-06 修订：连续 3 轮无新增但没有末尾证据时报告加载停滞，`exhausted=false`；只有明确页面末尾标记才设置 true。达到本次配额设置 `limit_reached=true`。
 
 #### 匿名 vs 登录（PR6a 必须实测填表；下列是实施前的**工作假设**）
 

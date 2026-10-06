@@ -1,0 +1,104 @@
+{
+  "$defs": {
+    "CaptureMode": {
+      "enum": [
+        "never",
+        "on_failure",
+        "always"
+      ],
+      "title": "CaptureMode",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "timeout_s": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Timeout S"
+    },
+    "capture_screenshot": {
+      "$ref": "#/$defs/CaptureMode",
+      "default": "on_failure"
+    },
+    "capture_html": {
+      "$ref": "#/$defs/CaptureMode",
+      "default": "never"
+    },
+    "upload_artifacts": {
+      "$ref": "#/$defs/CaptureMode",
+      "default": "never"
+    },
+    "respect_robots": {
+      "default": true,
+      "title": "Respect Robots",
+      "type": "boolean"
+    },
+    "redact_commenters": {
+      "default": false,
+      "title": "Redact Commenters",
+      "type": "boolean"
+    },
+    "locale": {
+      "default": "zh-CN",
+      "title": "Locale",
+      "type": "string"
+    },
+    "resume_from": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Resume From"
+    },
+    "since": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Since"
+    },
+    "known_ids": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 10000,
+      "title": "Known Ids",
+      "type": "array"
+    },
+    "sources": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 20,
+      "minItems": 1,
+      "title": "Sources",
+      "type": "array"
+    },
+    "max_items_per_source": {
+      "default": 20,
+      "maximum": 100,
+      "minimum": 1,
+      "title": "Max Items Per Source",
+      "type": "integer"
+    }
+  },
+  "title": "WebHotListParams",
+  "type": "object"
+}

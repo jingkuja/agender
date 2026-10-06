@@ -26,12 +26,16 @@ class FileLock:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self._fd = open(self.path, "a+", encoding="utf-8")
         if fcntl is None:
+            self._fd.close()
+            self._fd = None
             raise LockHeld("fcntl unavailable")
         try:
             fcntl.flock(self._fd.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
         except OSError as exc:
             self._fd.seek(0)
             meta = self._fd.read().strip()
+            self._fd.close()
+            self._fd = None
             raise LockHeld(f"{self.path} held ({meta})") from exc
         self._fd.seek(0)
         self._fd.truncate()

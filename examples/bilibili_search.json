@@ -1,0 +1,6 @@
+{
+  "schema_version": "1.0",
+  "task_id": "bilibili_search_demo",
+  "type": "bilibili.search",
+  "params": {"query": "Python 教程", "max_results": 10, "sort": "latest"}
+}

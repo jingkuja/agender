@@ -3,7 +3,8 @@ from __future__ import annotations
 import os
 import socket
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
+from urllib.parse import urlsplit
 
 import yaml
 from pydantic import BaseModel, Field, field_validator, model_validator
@@ -33,19 +34,30 @@ class WorkerConfig(BaseModel):
     heartbeat_interval_s: float = 20
     task_wall_clock_s: int = 180
     task_hard_cap_s: int = 600
+    shutdown_grace_s: float = Field(default=5, ge=0.1, le=30)
+    submit_retry_s: float = Field(default=2, ge=0.01, le=60)
     file_client: FileClientConfig = Field(default_factory=FileClientConfig)
 
 
 class ToolsConfig(BaseModel):
     web: bool = True
     douyin: bool = False
+    xiaohongshu: bool = False
+    weibo: bool = False
+    bilibili: bool = False
 
 
 class SessionBackupConfig(BaseModel):
     douyin: str = "data/sessions/douyin.storage_state.json"
+    xiaohongshu: str = "data/sessions/xiaohongshu.storage_state.json"
+    weibo: str = "data/sessions/weibo.storage_state.json"
+    bilibili: str = "data/sessions/bilibili.storage_state.json"
 
 
 class BrowserConfig(BaseModel):
+    mode: Literal["cdp", "playwright"] = "cdp"
+    cdp_endpoint_url: str = "http://127.0.0.1:9222"
+    cdp_timeout_ms: int = Field(default=10_000, ge=100, le=120_000)
     channel: str = "chrome"
     headless: str | bool = "auto"
     locale: str = "zh-CN"
@@ -56,6 +68,14 @@ class BrowserConfig(BaseModel):
     action_delay_ms: tuple[int, int] = (800, 2500)
     profile_dir: str = "data/profiles"
     session_backup: SessionBackupConfig = Field(default_factory=SessionBackupConfig)
+
+    @field_validator("cdp_endpoint_url")
+    @classmethod
+    def valid_cdp_endpoint(cls, value: str) -> str:
+        parsed = urlsplit(value)
+        if parsed.scheme not in {"http", "https", "ws", "wss"} or not parsed.hostname:
+            raise ValueError("cdp_endpoint_url must be an HTTP(S) or WS(S) URL")
+        return value
 
 
 class LimitsConfig(BaseModel):
@@ -73,15 +93,53 @@ class LimitsConfig(BaseModel):
 
 class DouyinConfig(BaseModel):
     tos_ack: bool = False
+    creator_enabled: bool = False
+    max_scroll_rounds: int = Field(default=30, ge=1, le=100)
+    stall_rounds: int = Field(default=3, ge=1, le=10)
+    load_wait_s: float = Field(default=8, ge=0.01, le=30)
     base_url: str = "https://www.douyin.com"
     login_url: str = "https://www.douyin.com/"
-    selector_pack_version: str = "2026-09-11"
+    selector_pack_version: str = "2026-10-06"
     redirect_allowlist: list[str] = Field(
         default_factory=lambda: ["v.douyin.com", "www.douyin.com", "www.iesdouyin.com"]
     )
     session_cookie_names: list[str] = Field(
         default_factory=lambda: ["sessionid", "sid_tt", "uid_tt", "ttwid"]
     )
+
+
+class SocialConfig(BaseModel):
+    tos_ack: bool = False
+    creator_enabled: bool = True
+    max_scroll_rounds: int = Field(default=30, ge=1, le=100)
+    stall_rounds: int = Field(default=3, ge=1, le=10)
+    load_wait_s: float = Field(default=2, ge=0.01, le=30)
+    selector_pack_version: str = "2026-10-06"
+    base_url: str
+    login_url: str
+    redirect_allowlist: list[str]
+    session_cookie_names: list[str]
+
+
+class XiaohongshuConfig(SocialConfig):
+    base_url: str = "https://www.xiaohongshu.com"
+    login_url: str = "https://www.xiaohongshu.com/explore"
+    redirect_allowlist: list[str] = Field(default_factory=lambda: ["www.xiaohongshu.com", "xiaohongshu.com", "xhslink.com", "www.xhslink.com"])
+    session_cookie_names: list[str] = Field(default_factory=lambda: ["web_session"])
+
+
+class WeiboConfig(SocialConfig):
+    base_url: str = "https://weibo.com"
+    login_url: str = "https://weibo.com/"
+    redirect_allowlist: list[str] = Field(default_factory=lambda: ["weibo.com", "www.weibo.com", "s.weibo.com", "m.weibo.cn", "passport.weibo.com", "passport.weibo.cn", "login.sina.com.cn"])
+    session_cookie_names: list[str] = Field(default_factory=lambda: ["SUB"])
+
+
+class BilibiliConfig(SocialConfig):
+    base_url: str = "https://www.bilibili.com"
+    login_url: str = "https://www.bilibili.com/"
+    redirect_allowlist: list[str] = Field(default_factory=lambda: ["www.bilibili.com", "bilibili.com", "search.bilibili.com", "space.bilibili.com", "passport.bilibili.com", "b23.tv"])
+    session_cookie_names: list[str] = Field(default_factory=lambda: ["SESSDATA"])
 
 
 class HotListItem(BaseModel):
@@ -120,6 +178,14 @@ class StoreConfig(BaseModel):
     artifact_retention_days: int = 7
     run_retention_days: int = 30
     log_retention_days: int = 14
+    content_enabled: bool = False
+    content_path: str = "data/content.db"
+    checkpoint_ttl_s: int = Field(default=86400, ge=60)
+
+
+class HealthConfig(BaseModel):
+    failure_threshold: int = Field(default=5, ge=1)
+    cooldown_s: float = Field(default=1800, ge=1)
 
 
 class ObservabilityConfig(BaseModel):
@@ -143,16 +209,22 @@ class AppConfig(BaseModel):
     browser: BrowserConfig = Field(default_factory=BrowserConfig)
     limits: LimitsConfig = Field(default_factory=LimitsConfig)
     douyin: DouyinConfig = Field(default_factory=DouyinConfig)
+    xiaohongshu: XiaohongshuConfig = Field(default_factory=XiaohongshuConfig)
+    weibo: WeiboConfig = Field(default_factory=WeiboConfig)
+    bilibili: BilibiliConfig = Field(default_factory=BilibiliConfig)
     web: WebConfig = Field(default_factory=WebConfig)
     store: StoreConfig = Field(default_factory=StoreConfig)
     observability: ObservabilityConfig = Field(default_factory=ObservabilityConfig)
+    health: HealthConfig = Field(default_factory=HealthConfig)
     token: str = ""
     root: Path = Field(default_factory=lambda: ROOT)
 
     @model_validator(mode="after")
     def tools_tos(self) -> AppConfig:
-        if self.tools.douyin and not self.douyin.tos_ack:
-            raise ValueError("tools.douyin=true requires douyin.tos_ack=true")
+        from agender.platforms import SESSION_SITES
+        for site in SESSION_SITES:
+            if getattr(self.tools, site) and not getattr(self, site).tos_ack:
+                raise ValueError(f"tools.{site}=true requires {site}.tos_ack=true")
         if not self.worker.id:
             self.worker.id = socket.gethostname()
         return self
@@ -198,6 +270,13 @@ def load_config(path: str | Path | None = None) -> AppConfig:
         env_overlay.setdefault("server", {})["base_url"] = os.environ["AGENDER_SERVER_BASE_URL"]
     if os.environ.get("AGENDER_WORKER_ID"):
         env_overlay.setdefault("worker", {})["id"] = os.environ["AGENDER_WORKER_ID"]
+    for env, key in (("AGENDER_BROWSER_MODE", "mode"), ("AGENDER_CDP_ENDPOINT_URL", "cdp_endpoint_url"),
+                     ("AGENDER_CDP_TIMEOUT_MS", "cdp_timeout_ms"), ("AGENDER_BROWSER_HEADLESS", "headless")):
+        if env in os.environ:
+            value = os.environ[env]
+            if key == "headless" and value.lower() in {"true", "false"}:
+                value = value.lower() == "true"
+            env_overlay.setdefault("browser", {})[key] = value
     data = _deep_merge(raw, env_overlay)
     root = cfg_path.parent.parent if cfg_path.parent.name == "config" else Path.cwd()
     cfg = AppConfig.model_validate({**data, "root": root})

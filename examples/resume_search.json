@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0",
+  "task_id": "REPLACE_WITH_ORIGINAL_TASK_ID",
+  "attempt": 2,
+  "type": "douyin.search",
+  "params": {
+    "query": "固态电池",
+    "max_results": 20,
+    "resume_from": "REPLACE_WITH_CHECKPOINT_ID"
+  }
+}

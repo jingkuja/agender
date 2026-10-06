@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0",
+  "task_id": "xhs_bundle_demo",
+  "type": "xiaohongshu.bundle",
+  "params": {
+    "url": "https://www.xiaohongshu.com/explore/65abcdef0123456789abcdef?xsec_token=REPLACE_WITH_SEARCH_LINK_TOKEN&xsec_source=pc_search",
+    "max_comments": 20,
+    "include_replies": true,
+    "max_replies_per_comment": 5
+  }
+}

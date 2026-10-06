@@ -2,7 +2,10 @@ from __future__ import annotations
 
 import asyncio
 import json
+from datetime import UTC, datetime
+from email.utils import parsedate_to_datetime
 from typing import Any
+from uuid import uuid4
 
 import httpx
 
@@ -77,7 +80,7 @@ class HttpClient:
             except httpx.HTTPError as exc:
                 last_exc = exc
                 if attempt == 4:
-                    raise ProtocolError("UNAVAILABLE", str(exc), retryable=True) from exc
+                    raise ProtocolError("UNAVAILABLE", type(exc).__name__, retryable=True) from exc
                 await asyncio.sleep(delay)
                 delay = min(delay * 2, 8)
                 continue
@@ -90,10 +93,25 @@ class HttpClient:
                 except json.JSONDecodeError:
                     parsed = None
             if 200 <= resp.status_code < 300:
-                return parsed or {}
+                if not isinstance(parsed, dict):
+                    raise ProtocolError("INVALID_RESPONSE", "expected JSON object", retryable=True)
+                return parsed
             err = _map_status(resp.status_code, parsed if isinstance(parsed, dict) else None)
-            if err.retryable and attempt < 4 and resp.status_code >= 500:
-                await asyncio.sleep(delay)
+            if resp.status_code == 413 and json_body and json_body.get("artifacts") and attempt < 4:
+                json_body = {**json_body, "artifacts": []}
+                continue
+            if err.retryable and attempt < 4 and (resp.status_code >= 500 or resp.status_code == 429):
+                wait = delay
+                retry_after = resp.headers.get("Retry-After")
+                if retry_after:
+                    try:
+                        wait = float(retry_after)
+                    except ValueError:
+                        try:
+                            wait = (parsedate_to_datetime(retry_after) - datetime.now(UTC)).total_seconds()
+                        except (TypeError, ValueError):
+                            pass
+                await asyncio.sleep(max(0, min(wait, 60)))
                 delay = min(delay * 2, 8)
                 last_exc = err
                 continue
@@ -105,7 +123,7 @@ class HttpClient:
         return HeartbeatAck.model_validate(data)
 
     async def claim(self, body: ClaimRequest) -> TaskClaim:
-        data = await self._request("POST", "/v1/tasks/claim", json_body=body.model_dump(mode="json"))
+        data = await self._request("POST", "/v1/tasks/claim", json_body=body.model_dump(mode="json"), idempotency=f"claim:{body.worker_id}:{uuid4()}")
         return TaskClaim.model_validate(data)
 
     async def progress(self, task_id: str, body: Progress) -> ProgressAck:

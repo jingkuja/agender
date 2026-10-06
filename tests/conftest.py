@@ -15,6 +15,7 @@ def cfg(tmp_path, monkeypatch):
     example = Path(__file__).resolve().parents[1] / "config" / "config.example.yaml"
     c = load_config(example)
     c.root = tmp_path
+    c.browser.mode = "playwright"
     c.tools.web = True
     c.tools.douyin = True
     c.douyin.tos_ack = True

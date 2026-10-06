@@ -1,0 +1,124 @@
+{
+  "$defs": {
+    "CaptureMode": {
+      "enum": [
+        "never",
+        "on_failure",
+        "always"
+      ],
+      "title": "CaptureMode",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "timeout_s": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Timeout S"
+    },
+    "capture_screenshot": {
+      "$ref": "#/$defs/CaptureMode",
+      "default": "on_failure"
+    },
+    "capture_html": {
+      "$ref": "#/$defs/CaptureMode",
+      "default": "never"
+    },
+    "upload_artifacts": {
+      "$ref": "#/$defs/CaptureMode",
+      "default": "never"
+    },
+    "respect_robots": {
+      "default": true,
+      "title": "Respect Robots",
+      "type": "boolean"
+    },
+    "redact_commenters": {
+      "default": false,
+      "title": "Redact Commenters",
+      "type": "boolean"
+    },
+    "locale": {
+      "default": "zh-CN",
+      "title": "Locale",
+      "type": "string"
+    },
+    "resume_from": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Resume From"
+    },
+    "since": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Since"
+    },
+    "known_ids": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 10000,
+      "title": "Known Ids",
+      "type": "array"
+    },
+    "urls": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Urls",
+      "type": "array"
+    },
+    "include_body": {
+      "default": true,
+      "title": "Include Body",
+      "type": "boolean"
+    },
+    "max_body_chars": {
+      "default": 20000,
+      "maximum": 200000,
+      "minimum": 1,
+      "title": "Max Body Chars",
+      "type": "integer"
+    },
+    "allowlist": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Allowlist",
+      "type": "array"
+    },
+    "denylist": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Denylist",
+      "type": "array"
+    }
+  },
+  "required": [
+    "urls"
+  ],
+  "title": "WebFetchParams",
+  "type": "object"
+}

@@ -1,0 +1,6 @@
+{
+  "schema_version": "1.0",
+  "task_id": "weibo_search_demo",
+  "type": "weibo.search",
+  "params": {"query": "人工智能", "max_results": 10, "sort": "latest"}
+}

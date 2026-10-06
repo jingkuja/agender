@@ -1,0 +1,6 @@
+{
+  "schema_version": "1.0",
+  "task_id": "xhs_search_demo",
+  "type": "xiaohongshu.search",
+  "params": {"query": "露营", "max_results": 10, "sort": "general"}
+}

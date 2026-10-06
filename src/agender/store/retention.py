@@ -16,9 +16,11 @@ def _older_than(path: Path, days: int) -> bool:
 
 async def gc(store: Store, *, artifact_dir: Path, log_path: Path, artifact_days: int, run_days: int, log_days: int) -> dict[str, int]:
     deleted_files = 0
+    cursor = await store.db.execute("SELECT path FROM artifacts WHERE run_id IN (SELECT id FROM task_runs WHERE status IN ('running','submitting'))")
+    protected = {Path(row[0]).resolve() for row in await cursor.fetchall()}
     if artifact_dir.exists():
         for p in artifact_dir.rglob("*"):
-            if p.is_file() and _older_than(p, artifact_days):
+            if p.is_file() and p.resolve() not in protected and _older_than(p, artifact_days):
                 p.unlink(missing_ok=True)
                 deleted_files += 1
     if log_path.exists() and _older_than(log_path, log_days):
@@ -26,15 +28,15 @@ async def gc(store: Store, *, artifact_dir: Path, log_path: Path, artifact_days:
         deleted_files += 1
     cutoff = f"-{run_days} days"
     cur = await store.db.execute(
-        "DELETE FROM events WHERE ts < datetime('now', ?)", (cutoff,)
+        "DELETE FROM events WHERE julianday(ts) < julianday('now', ?) AND (run_id IS NULL OR run_id IN (SELECT id FROM task_runs WHERE status IN ('acked','interrupted','superseded')))", (cutoff,)
     )
     events = cur.rowcount if cur.rowcount and cur.rowcount > 0 else 0
     cur = await store.db.execute(
-        "DELETE FROM artifacts WHERE created_at < datetime('now', ?)", (cutoff,)
+        "DELETE FROM artifacts WHERE julianday(created_at) < julianday('now', ?) AND run_id IN (SELECT id FROM task_runs WHERE status IN ('acked','interrupted','superseded'))", (cutoff,)
     )
     arts = cur.rowcount if cur.rowcount and cur.rowcount > 0 else 0
     cur = await store.db.execute(
-        "DELETE FROM task_runs WHERE created_at < datetime('now', ?) AND status IN ('acked','interrupted','superseded')",
+        "DELETE FROM task_runs WHERE julianday(created_at) < julianday('now', ?) AND status IN ('acked','interrupted','superseded')",
         (cutoff,),
     )
     runs = cur.rowcount if cur.rowcount and cur.rowcount > 0 else 0
