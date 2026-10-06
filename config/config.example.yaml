@@ -1,0 +1,99 @@
+server:
+  base_url: ""
+  timeout_s: 30
+
+worker:
+  id: ""
+  poll_interval_s: 15
+  poll_jitter_s: 5
+  heartbeat_interval_s: 20
+  task_wall_clock_s: 180
+  task_hard_cap_s: 600
+  file_client:
+    inbox_dir: data/inbox/tasks
+    outbox_dir: data/outbox
+
+tools:
+  web: true
+  douyin: false
+
+browser:
+  channel: chrome
+  headless: auto
+  locale: zh-CN
+  timezone_id: Asia/Shanghai
+  viewport: { width: 1440, height: 900 }
+  slow_mo_ms: 50
+  navigation_timeout_ms: 30000
+  action_delay_ms: [800, 2500]
+  profile_dir: data/profiles
+  session_backup:
+    douyin: data/sessions/douyin.storage_state.json
+
+limits:
+  douyin_comments_default: 20
+  douyin_comments_max: 200
+  douyin_bundle_wall_clock_s: 240
+  session_login_wall_clock_s: 300
+  web_result_pages_default: 2
+  web_article_bodies_default: 3
+  web_urls_max: 20
+  per_host_rpm:
+    www.douyin.com: 6
+    default: 10
+
+douyin:
+  tos_ack: false
+  base_url: https://www.douyin.com
+  login_url: https://www.douyin.com/
+  selector_pack_version: "2026-09-11"
+  redirect_allowlist:
+    - v.douyin.com
+    - www.douyin.com
+    - www.iesdouyin.com
+  session_cookie_names: ["sessionid", "sid_tt", "uid_tt", "ttwid"]
+
+web:
+  respect_robots: true
+  default_search_engine: auto
+  max_body_chars: 20000
+  denylist_cidrs:
+    - 127.0.0.0/8
+    - 10.0.0.0/8
+    - 172.16.0.0/12
+    - 192.168.0.0/16
+    - 169.254.0.0/16
+    - 100.64.0.0/10
+    - "::1/128"
+    - "fe80::/10"
+    - "fc00::/7"
+  denylist_hosts:
+    - localhost
+    - metadata.google.internal
+  block_gov_cn: true
+  hot_lists:
+    baidu_hot:
+      enabled: true
+      url: "https://top.baidu.com/board?tab=realtime"
+    sina_news:
+      enabled: false
+      url: "https://news.sina.com.cn/"
+    toutiao_hot:
+      enabled: false
+      url: ""
+    zhihu_hot:
+      enabled: false
+      url: ""
+
+store:
+  sqlite_path: data/agender.db
+  artifact_dir: data/artifacts
+  log_path: data/logs/agender.jsonl
+  artifact_retention_days: 7
+  run_retention_days: 30
+  log_retention_days: 14
+
+observability:
+  log_level: INFO
+  log_json: true
+  metrics_addr: 127.0.0.1:9108

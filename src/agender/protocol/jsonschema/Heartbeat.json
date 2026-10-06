@@ -1,0 +1,118 @@
+{
+  "$defs": {
+    "HeartbeatMetrics": {
+      "properties": {
+        "uptime_s": {
+          "default": 0,
+          "title": "Uptime S",
+          "type": "integer"
+        },
+        "tasks_completed": {
+          "default": 0,
+          "title": "Tasks Completed",
+          "type": "integer"
+        },
+        "blocked_rate_1h": {
+          "default": 0.0,
+          "title": "Blocked Rate 1H",
+          "type": "number"
+        }
+      },
+      "title": "HeartbeatMetrics",
+      "type": "object"
+    },
+    "SessionState": {
+      "enum": [
+        "ok",
+        "expired",
+        "missing",
+        "unknown"
+      ],
+      "title": "SessionState",
+      "type": "string"
+    },
+    "WorkerStatus": {
+      "enum": [
+        "idle",
+        "busy",
+        "degraded",
+        "stopping"
+      ],
+      "title": "WorkerStatus",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "schema_version": {
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "worker_id": {
+      "title": "Worker Id",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/WorkerStatus"
+    },
+    "current_task_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Current Task Id"
+    },
+    "lease_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Lease Id"
+    },
+    "browser_ready": {
+      "default": false,
+      "title": "Browser Ready",
+      "type": "boolean"
+    },
+    "sessions": {
+      "additionalProperties": {
+        "$ref": "#/$defs/SessionState"
+      },
+      "title": "Sessions",
+      "type": "object"
+    },
+    "capabilities": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Capabilities",
+      "type": "array"
+    },
+    "disabled_capabilities": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Disabled Capabilities",
+      "type": "array"
+    },
+    "metrics": {
+      "$ref": "#/$defs/HeartbeatMetrics"
+    }
+  },
+  "required": [
+    "worker_id",
+    "status"
+  ],
+  "title": "Heartbeat",
+  "type": "object"
+}

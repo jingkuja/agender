@@ -1,0 +1,32 @@
+{
+  "properties": {
+    "schema_version": {
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "worker_id": {
+      "title": "Worker Id",
+      "type": "string"
+    },
+    "capabilities": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Capabilities",
+      "type": "array"
+    },
+    "max_tasks": {
+      "const": 1,
+      "default": 1,
+      "title": "Max Tasks",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "worker_id",
+    "capabilities"
+  ],
+  "title": "ClaimRequest",
+  "type": "object"
+}

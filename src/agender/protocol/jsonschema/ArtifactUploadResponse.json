@@ -1,0 +1,33 @@
+{
+  "properties": {
+    "schema_version": {
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "ok": {
+      "default": true,
+      "title": "Ok",
+      "type": "boolean"
+    },
+    "artifact_id": {
+      "title": "Artifact Id",
+      "type": "string"
+    },
+    "sha256": {
+      "title": "Sha256",
+      "type": "string"
+    },
+    "stored": {
+      "default": false,
+      "title": "Stored",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "artifact_id",
+    "sha256"
+  ],
+  "title": "ArtifactUploadResponse",
+  "type": "object"
+}

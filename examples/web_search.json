@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0",
+  "task_id": "ex_web_search",
+  "type": "web.search",
+  "attempt": 1,
+  "params": {
+    "query": "2026 固态电池 量产",
+    "search_engine": "auto",
+    "max_pages": 2
+  }
+}

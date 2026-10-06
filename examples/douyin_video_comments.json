@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0",
+  "task_id": "ex_dy_comments",
+  "type": "douyin.video_comments",
+  "attempt": 1,
+  "params": {
+    "url": "https://www.douyin.com/video/7123456789012345678",
+    "max_comments": 20,
+    "include_replies": false
+  }
+}

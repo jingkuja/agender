@@ -1,0 +1,14 @@
+[Unit]
+Description=agender-worker browsing daemon
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/agender-worker
+EnvironmentFile=-/opt/agender-worker/.env
+ExecStart=/opt/agender-worker/.venv/bin/agender-worker worker --config /opt/agender-worker/config/config.yaml
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

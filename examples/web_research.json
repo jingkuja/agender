@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "task_id": "ex_web_research",
+  "type": "web.research",
+  "attempt": 1,
+  "params": {
+    "query": "地方银行 高股息",
+    "search_engine": "auto",
+    "max_pages": 2,
+    "max_articles": 3
+  }
+}
